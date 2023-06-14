@@ -35,7 +35,7 @@ def app_test_cookies(app: Chasha):
 @pytest.fixture(scope='function')
 def app_test_body(app: Chasha):
     @app.get('/')
-    def index(body: dict = app.di.body()):
+    def index(body: str = app.di.body()):
         assert body == 'content'
         return 'ok'
     yield app
@@ -44,7 +44,7 @@ def app_test_body(app: Chasha):
 @pytest.fixture(scope='function')
 def app_test_no_body(app: Chasha):
     @app.get('/')
-    def index(body: dict = app.di.body()):
+    def index(body: str = app.di.body()):
         assert body == ''
         return 'ok'
     yield app
