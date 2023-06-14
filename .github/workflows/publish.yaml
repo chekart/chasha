@@ -1,4 +1,9 @@
-name: Test
+name: Publish
+
+on:
+  release:
+    types:
+      - created
 
 jobs:
   pypi-publish:
