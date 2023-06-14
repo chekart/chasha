@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>ToDo List</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+            const { useState, useEffect } = React;
+
+            function TodoItem(props) {
+                return (
+                    <li
+                        key={props.id}
+                        className="flex bg-slate-500 px-4 py-4 my-2 rounded-lg shadow-lg"
+                    >
+                        <span className="flex-grow">{props.name}</span>
+                        <button className="text-white" onClick={() => props.delete(props.id)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                 className="w-6 h-6">
+                                <path fillRule="evenodd"
+                                      d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z"
+                                      clipRule="evenodd"/>
+                            </svg>
+                        </button>
+                    </li>
+                )
+            }
+
+            function App() {
+                const [todos, setTodos] = useState([]);
+                const [todoText, setTodoText] = useState('');
+
+                const syncTodos = async () => {
+                    const response = await fetch('/api/todo');
+                    if (response.ok) {
+                        const data = await response.json();
+                        setTodos(data);
+                    }
+                }
+
+                const addTodo = async (name) => {
+                    const response = await fetch('/api/todo', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            'name': name
+                        })
+                    });
+                    if (response.ok) {
+                        await syncTodos();
+                    }
+                }
+
+                const deleteTodo = async (id) => {
+                    const response = await fetch('/api/todo/' + id, {
+                        method: 'DELETE',
+                    });
+                    if (response.ok) {
+                        await syncTodos();
+                    }
+                }
+
+                useEffect(() => {
+                    syncTodos().then();
+                }, []);
+
+                const onAddTodo = () => {
+                    if (todoText.trim() === '') {
+                        return;
+                    }
+                    addTodo(todoText).then(() => {
+                        setTodoText('');
+                    });
+                }
+
+                const onTodoTextChange = (e) => {
+                    setTodoText(e.target.value);
+                }
+
+                const onDeleteTodo = (id) => {
+                    deleteTodo(id).then();
+                }
+
+                return (
+                    <div className="bg-slate-300 flex min-h-screen justify-center">
+                        <div className="max-w-xl w-full bg-gray-800 text-white my-10 px-4 py-4 rounded-lg shadow-lg">
+                            <h1 className="text-xl font-bold">TodoList()</h1>
+                            <div className="flex my-4">
+                                <input
+                                    type="text"
+                                    value={todoText}
+                                    onChange={onTodoTextChange}
+                                    className="flex-grow border-2 bg-gray-600 placeholder-gray-400 text-white rounded-l-md p-2 focus:outline-none"
+                                    placeholder="task: str"
+                                />
+                                <button onClick={onAddTodo} className="bg-indigo-600 px-4 py-2 rounded-r-md">todo.add</button>
+                            </div>
+                            <ul>
+                                {todos.map(todo => (<TodoItem key={todo.id} id={todo.id} name={todo.name} delete={onDeleteTodo}/>))}
+                            </ul>
+                        </div>
+                    </div>
+                )
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<App />);
+        </script>
+    </body>
+</html>

@@ -1,0 +1,16 @@
+[project]
+name = "chasha"
+description = "Microframework for serverless functions"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+
+[tool.mypy]
+strict=false
+
+[tool.ruff]
+select = ['E', 'W', 'F', 'C', 'B']
+ignore = ['B008', 'B904']
+line-length = 120
+target-version = "py310"
+
