@@ -1,3 +1,4 @@
+import base64
 from chasha.contrib.adapters.yandex import YandexCloudAdapter
 
 
@@ -71,6 +72,21 @@ def test_body(app_test_body):
         'httpMethod': 'get',
         'url': '/',
         'body': data,
+    }
+
+    response = YandexCloudAdapter(app_test_body).handler(event, object())
+    assert response['statusCode'] == 200
+    assert response['body'] == 'ok'
+
+
+def test_body_b64(app_test_body):
+    data = base64.b64encode(b'content')
+
+    event = {
+        'httpMethod': 'get',
+        'url': '/',
+        'body': data,
+        'isBase64Encoded': True,
     }
 
     response = YandexCloudAdapter(app_test_body).handler(event, object())

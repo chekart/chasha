@@ -1,3 +1,4 @@
+import base64
 from urllib.parse import urlparse
 from chasha import Chasha, Request
 
@@ -24,12 +25,16 @@ class YandexCloudAdapter:
 
     @classmethod
     def adapt_request(cls, event):
+        body = event.get('body', '')
+        if body and event.get('isBase64Encoded'):
+            body = base64.b64decode(body).decode('utf-8')
+
         request = Request(
             method=event['httpMethod'],
             query=cls._denormalize_multi_value(event.get('multiValueQueryStringParameters', {})),
             headers=event.get('headers', {}),
             path=cls._get_path(event['url']),
-            body=event.get('body', ''),
+            body=body,
             raw=event
         )
         return request
