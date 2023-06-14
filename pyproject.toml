@@ -3,7 +3,7 @@ name = "chasha"
 description = "Microframework for serverless functions"
 readme = "README.md"
 requires-python = ">=3.10"
-version = '0.0.1'
+version = '0.0.2'
 
 [tool.mypy]
 strict=false
