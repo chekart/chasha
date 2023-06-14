@@ -1,0 +1,34 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10, 3.11"]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ runner.os }}-python-${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml', 'dev.requirements.txt') }}
+      - name: Install requirements
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: pip install -r dev.requirements.txt
+      - name: Lint
+        run: ruff chasha tests examples
+      - name: Type check
+        run: mypy chasha tests examples
+      - name: Tests
+        run: pytest
