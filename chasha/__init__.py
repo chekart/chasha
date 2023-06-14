@@ -1,5 +1,3 @@
-__version__ = '0.0.1'
-
 from .core import Chasha
 from .core import Chashka
 from .core import DI
